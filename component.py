@@ -143,103 +143,6 @@ class MovableButton(QPushButton):
             self.button_delete.emit()
 
 
-# used for TextEditableButton
-class LineEditForButton(QLineEdit):
-    double_clicked = Signal()
-    left_clicked = Signal()
-    focus_out = Signal()
-
-    def __init__(self, parent=None):
-        super(LineEditForButton, self).__init__(parent)
-
-    def mousePressEvent(self, e):
-        super(LineEditForButton, self).mousePressEvent(e)
-        if e.button() == QtCore.Qt.LeftButton:
-            self.left_clicked.emit()
-
-    def mouseDoubleClickEvent(self, e):
-        self.double_clicked.emit()
-
-    # def focusOutEvent(self, e):
-    #     super(LineEdit, self).focusOutEvent(e)
-    #     self.focus_out.emit()
-    #     print("oouttt")
-
-
-# text editable QPushButton
-# edit text by double clicking
-# QLineEdit inside a QPushbutton
-class TextEditableButton(QPushButton):
-    lineEdit_leftClicked = Signal()
-    STYLE = """
-          QLineEdit[editMode=false]{
-          background-color: transparent;
-          }
-          QLineEdit[editMode=true]{
-          background-color: black;
-          border-width: 0px;
-          }    
-    """
-
-    def __init__(self, text_editable=False, text=None, parent=None):
-        super(TextEditableButton, self).__init__(parent)
-        self.layout = QtWidgets.QHBoxLayout()
-        self.setLayout(self.layout)
-
-        self.lineEdit = LineEditForButton()
-        self.lineEdit.setFrame(False)
-
-        self.text_editable = text_editable
-        self.text = text
-        if self.text:
-            self.lineEdit.setText(self.text)
-
-        self.lineEdit.setReadOnly(True)
-        self.lineEdit.resize(self.lineEdit.sizeHint())
-        self.lineEdit.editingFinished.connect(self.turnOffEditMode)
-        self.lineEdit.editingFinished.connect(self.refreshText)
-        self.lineEdit.double_clicked.connect(self.turnOnEditMode)
-        self.lineEdit.left_clicked.connect(self.emitLineEditSignal)
-        # self.lineEdit.focus_out.connect(self.turnOffEditMode)
-
-        self.lineEdit.setProperty("editMode", False)
-        self.layout.addWidget(self.lineEdit)
-        self.layout.setContentsMargins(5, 0, 5, 0)
-        self.setStyleSheet(self.STYLE)
-
-    def turnOffEditMode(self):
-        self.lineEdit.setReadOnly(True)
-        self.lineEdit.setProperty("editMode", False)
-        if self.text:
-            self.lineEdit.setSelection(0, 0)
-        self.setStyleSheet(self.STYLE)
-        print("turn off edit mode")
-
-    def turnOnEditMode(self):
-        if self.text:
-            self.lineEdit.setSelection(0, len(self.text))
-        self.lineEdit.setReadOnly(False)
-        self.lineEdit.setProperty("editMode", True)
-        self.setStyleSheet(self.STYLE)
-
-    def refreshText(self):
-        self.text = self.lineEdit.text()
-        print(self.text)
-
-    def mousePressEvent(self, e):
-        if e.button() == QtCore.Qt.LeftButton or e.button() == QtCore.Qt.RightButton:
-            if self.lineEdit.property("editMode"):
-                self.turnOffEditMode()
-
-    def mouseDoubleClickEvent(self, e):
-        if self.text_editable:
-            self.turnOnEditMode()
-        print("double click")
-
-    def emitLineEditSignal(self):
-        self.lineEdit_leftClicked.emit()
-
-
 # default edit mode is false
 # double click to enable editing
 class LineEdit(QLineEdit):
@@ -400,5 +303,4 @@ class CheckBox(QFrame):
     def mousePressEvent(self, e):
         if e.button() == QtCore.Qt.LeftButton:
             self.setSelectionStatus(-1)
-
 
