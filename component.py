@@ -304,3 +304,4 @@ class CheckBox(QFrame):
         if e.button() == QtCore.Qt.LeftButton:
             self.setSelectionStatus(-1)
 
+           
